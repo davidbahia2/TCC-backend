@@ -1,0 +1,10 @@
+spring:
+  application:name: BackEnd
+
+cors: {}
+
+security:
+  jwt:
+token:
+secret-key: 53cr37
+expire-length: 3600000
