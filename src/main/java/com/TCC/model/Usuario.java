@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.TCC.enums.UserRole;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +31,7 @@ public class Usuario implements UserDetails{
     
 
 @Id
+@GeneratedValue(strategy = GenerationType.UUID)
 private String id;
 @NotBlank(message = "campo obrigatorio")
 private String email;
@@ -38,6 +41,12 @@ private String nome;
 private String senha;
 private UserRole role;
 
+
+public Usuario(String nome, String senha, UserRole role){
+    this.nome = nome;
+    this.senha = senha;
+    this.role = role;
+}
 
 @Override
 public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -8,8 +8,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import com.TCC.model.Diario;
 public interface DiarioRepository extends MongoRepository <Diario,String> {
 
-     List<Diario> findByUserId(String userId);
+     List<Diario> ProcuraPorId(String userId);
 
-    List<Diario> findByUserIdAndDataCriacaoAfter(String userId, LocalDateTime data);
+    List<Diario> procuraPorIdData(String userId, LocalDateTime data);
 
+    long contaPorIdData(String userId, LocalDateTime dataCriacao);
+
+
+    long contaPorId(String userId);
 }

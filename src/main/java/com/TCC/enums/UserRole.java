@@ -1,10 +1,17 @@
-package com.TCC.enum;
+package com.TCC.enums;
 
 public enum UserRole {
-    ADMIN,
-    USUARIO;
+    ADMIN("admin"),
+    USUARIO("usuario");
 
     private String role;
 
-    public 
+    UserRole(String role){
+        this.role = role;
+    }
+
+
+    public String getRole(){
+        return role;
+    }
 }

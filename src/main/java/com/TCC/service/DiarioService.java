@@ -25,13 +25,13 @@ public class DiarioService {
 
 
     public List<Diario> buscarDiaroPorUsuario(String userId){
-        return diarioRepository.findByUserId(userId);
+        return diarioRepository.ProcuraPorId(userId);
     }
 
     public double calcularHumorMedioDaSemana(String userId) {
 
         LocalDateTime umaSemanaAtras = LocalDateTime.now().minusWeeks(1);
-        List<Diario> entradasDaSemana = diarioRepository.findByUserIdAndDataCriacaoAfter(userId, umaSemanaAtras);
+        List<Diario> entradasDaSemana = diarioRepository.procuraPorIdData(userId, umaSemanaAtras);
 
         if (entradasDaSemana.isEmpty()) {
             return 0.0;
@@ -57,5 +57,14 @@ public class DiarioService {
                 .sum();
 
         return somaHumores / entradasDaSemana.size();
+    }
+
+        public long contarEntradasDaSemana(String userId) {
+        LocalDateTime umaSemanaAtras = LocalDateTime.now().minusWeeks(1);
+        return diarioRepository.contaPorIdData(userId, umaSemanaAtras);
+    }
+    
+      public long contarTotalDeEntradas(String userId) {
+        return diarioRepository.contaPorId(userId);
     }
 }

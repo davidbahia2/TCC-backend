@@ -19,17 +19,19 @@ public UsuarioService (UsuarioRepository usuarioRepository){
     this.usuarioRepository = usuarioRepository;
 }
 
-
-
-
-
-
-
-
 @Override
 public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return usuarioRepository.findByNome(username)
-        .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'loadUserByUsername'");
 }
+
+
+
+
+
+
+
+
+
     
 }
