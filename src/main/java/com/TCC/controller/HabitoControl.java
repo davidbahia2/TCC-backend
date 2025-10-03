@@ -66,7 +66,7 @@ public ResponseEntity<Map<DayOfWeek,Map<String, Long>>> contabilizaHabitoPorDia(
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Habito> atualizaHabito(@PathVariable String id, @RequestBody Habito habito) {
+    public ResponseEntity<Habito> atualizaHabito(@PathVariable int id, @RequestBody Habito habito) {
         try {
             Habito habitos = habitoService.atualizaHabito(id, habito);
             return ResponseEntity.ok(habitos);
@@ -76,7 +76,7 @@ public ResponseEntity<Map<DayOfWeek,Map<String, Long>>> contabilizaHabitoPorDia(
         }
     }
     @DeleteMapping("/deleta/{id}")
-    public ResponseEntity<Void> deletaHabito(@PathVariable String id){
+    public ResponseEntity<Void> deletaHabito(@PathVariable int id){
         try {
             habitoService.deletarHabito(id);
             return ResponseEntity.noContent().build();
@@ -86,7 +86,7 @@ public ResponseEntity<Map<DayOfWeek,Map<String, Long>>> contabilizaHabitoPorDia(
     }
 
     @PutMapping("/desmarcar/{id}")
-    public ResponseEntity<Habito> desmarcarHabito(@PathVariable String id) {
+    public ResponseEntity<Habito> desmarcarHabito(@PathVariable int id) {
         try {
             Habito habitos = habitoService.desconcluirHabito(id);
             return ResponseEntity.ok(habitos);
@@ -96,7 +96,7 @@ public ResponseEntity<Map<DayOfWeek,Map<String, Long>>> contabilizaHabitoPorDia(
     }
 
     @PutMapping("/{id}/concluir")
-    public ResponseEntity<Habito> marcarHabito(@PathVariable String id) {
+    public ResponseEntity<Habito> marcarHabito(@PathVariable int id) {
         try {
             Habito habitos = habitoService.concluirHabito(id);
             return ResponseEntity.ok(habitos);

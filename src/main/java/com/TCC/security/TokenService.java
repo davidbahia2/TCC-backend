@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import javax.management.RuntimeErrorException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +15,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 
 @Service
 public class TokenService {
-    @Value("{$api.security.token.secret}")
+    @Value("${api.security.token.secret}")
     private String secret;
 
     public String generateToken(Usuario user) {
@@ -43,7 +41,7 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException e) {
-        return "";
+            return "";
         }
     }
 

@@ -1,42 +1,66 @@
 package com.TCC.model;
 
 import java.io.ObjectInputFilter.Status;
+import java.time.Duration;
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.TCC.enums.*;
+
 import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
+@Entity
+@Table(name = "respiracao")
 public class Respiracao {
     
-@Id
-private String id;
-private int cicloTotal;
-private int cicloAtual;
-private String nome;
-  private int duracaoInspira;    
-      private int duracaoSegura;     
-    private int duracaoExpira; 
+   @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    
 
-   @Enumerated(EnumType.STRING)
-private Status status;
-private LocalDateTime inicio;
-private LocalDateTime fim;
+    private TipoRespiracao tipoRespiracao;
+    
 
-
-    public enum Status {
-        PRONTO,
-        EM_ANDAMENTO,
-        PAUSADO,
-        FINALIZADO
+    @Column(name = "dataInicio")
+    private LocalDateTime dataInicio;
+    
+@Column(name = "dataFim")
+    private LocalDateTime dataFim;
+    
+    private Integer ciclosCompletados = 0;
+    
+@Column(name = "sessaocompleta")
+    private Boolean sessaoCompleta = false;
+    
+@Column(name = "duracaoRealSegundos")
+    private Long duracaoRealSegundos;
+      
+    private int usuarioId; 
+    
+  public Respiracao (TipoRespiracao tipoRespiracao, int usuarioId) {
+        this.tipoRespiracao = tipoRespiracao;
+        this.usuarioId = usuarioId;
+        this.dataInicio = LocalDateTime.now();
     }
+
+     public void finalizarSessao(int ciclosCompletados) {
+        this.dataFim = LocalDateTime.now();
+        this.ciclosCompletados = ciclosCompletados;
+        this.sessaoCompleta = (ciclosCompletados >= tipoRespiracao.getCiclos());
+        this.duracaoRealSegundos = Duration.between(dataInicio, dataFim).getSeconds();
+        this.duracaoRealSegundos = java.time.Duration.between(dataInicio, dataFim).getSeconds();
+    
+}
 }

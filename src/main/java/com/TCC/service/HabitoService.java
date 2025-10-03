@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.TCC.DTO.HabitoDTO;
 import com.TCC.model.Habito;
 import com.TCC.repository.HabitoRepository;
 
@@ -39,7 +38,7 @@ public class HabitoService {
 
     // busca por dia da semana
     public List<Habito> buscarHabitoPorDia(DayOfWeek diaSemana) {
-        return habitoRepository.buscarPorDia(diaSemana);
+        return habitoRepository.findByDiaSemana(diaSemana);
     }
 
 //busca o habito atual
@@ -54,8 +53,8 @@ public class HabitoService {
         for(DayOfWeek dia: DayOfWeek.values()){
          
 
-        Long totalHabito = habitoRepository.contaPordia(dia);
-        Long HabitoConcluido = habitoRepository.contaConcluidaPorSemana(dia);
+        Long totalHabito = habitoRepository.countByDiaSemana(dia);
+        Long HabitoConcluido = habitoRepository.countByDiaSemanaAndConcluidaTrue(dia);
 
         Map<String,Long> grafico = new HashMap<>();
         grafico.put("total", totalHabito);
@@ -70,8 +69,8 @@ public class HabitoService {
         Map<DayOfWeek, Double> percentuais = new HashMap<>();
 
         for(DayOfWeek dia: DayOfWeek.values()){
-            Long total = habitoRepository.contaPordia(dia);
-            Long concluidas = habitoRepository.contaConcluidaPorSemana(dia);
+            Long total = habitoRepository.countByDiaSemana(dia);
+            Long concluidas = habitoRepository.countByDiaSemanaAndConcluidaTrue(dia);
 
             Double percentual = total > 0 ?(concluidas.doubleValue()/ total.doubleValue())* 100:0;
             percentuais.put(dia, percentual);
@@ -80,7 +79,7 @@ public class HabitoService {
 
     }
     // marca como concluido o habito
-    public Habito concluirHabito(String HabitoId) {
+    public Habito concluirHabito(int HabitoId) {
         Optional<Habito> OptHabito = habitoRepository.findById(HabitoId);
 
         if (OptHabito.isPresent()) {
@@ -96,8 +95,8 @@ public class HabitoService {
     }
 
     // desmarca o Habito
-    public Habito desconcluirHabito(String HabitoId) {
-        Optional<Habito> optHabito = habitoRepository.findById(HabitoId);
+    public Habito desconcluirHabito(int id) {
+        Optional<Habito> optHabito = habitoRepository.findById(id);
 
         if (optHabito.isPresent()) {
             Habito habito = optHabito.get();
@@ -106,10 +105,10 @@ public class HabitoService {
             return habitoRepository.save(habito);
         }
 
-        throw new RuntimeException("Tarefa não encontrada com ID: " + HabitoId);
+        throw new RuntimeException("Tarefa não encontrada com ID: " + id);
     }
-
-    public Habito atualizaHabito(String id, Habito habito) {
+    
+    public Habito atualizaHabito(int id, Habito habito) {
         Optional<Habito> optHabito = habitoRepository.findById(id);
 
         if (optHabito.isPresent()) {
@@ -123,7 +122,7 @@ public class HabitoService {
 
     }
 
-    public void deletarHabito(String id) {
+    public void deletarHabito(int id) {
         if (!habitoRepository.existsById(id)) {
             throw new RuntimeException("Habito nao encontrado pelo id");
         }

@@ -46,7 +46,7 @@ public class RespiracaoController {
     }
 
     @PutMapping("/{sessaoId}/finalizar")
-    public ResponseEntity<Respiracao> finalizarSessao(@PathVariable String sessaoId,
+    public ResponseEntity<Respiracao> finalizarSessao(@PathVariable int sessaoId,
             @RequestBody FinalizarSessaoDTO dto) {
         try {
             Respiracao sessao = respiracaoService.finalizar(sessaoId, dto);
@@ -56,14 +56,14 @@ public class RespiracaoController {
         }
     }
   @GetMapping("/ativa/{usuarioId}")
-    public ResponseEntity<Respiracao> buscarSessaoAtiva(@PathVariable String usuarioId) {
+    public ResponseEntity<Respiracao> buscarSessaoAtiva(@PathVariable int usuarioId) {
         Optional<Respiracao> sessao = respiracaoService.buscaSessaoAtiva(usuarioId);
         return sessao.map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
     }
 
         @DeleteMapping("/cancelar/{usuarioId}")
-    public ResponseEntity<Void> cancelarSessaoAtiva(@PathVariable String usuarioId) {
+    public ResponseEntity<Void> cancelarSessaoAtiva(@PathVariable int usuarioId) {
         try {
             respiracaoService.cancelarSessaoAtiva(usuarioId);
             return ResponseEntity.noContent().build();
@@ -73,28 +73,28 @@ public class RespiracaoController {
     }
  // Histórico de sessões
     @GetMapping("/historico/{usuarioId}")
-    public ResponseEntity<List<Respiracao>> buscarHistorico(@PathVariable String usuarioId) {
+    public ResponseEntity<List<Respiracao>> buscarHistorico(@PathVariable int usuarioId) {
         List<Respiracao> historico = respiracaoService.buscarHistorico(usuarioId);
         return ResponseEntity.ok(historico);
     }
     
     // Sessões completas
     @GetMapping("/completas/{usuarioId}")
-    public ResponseEntity<List<Respiracao>> buscarSessoesCompletas(@PathVariable String usuarioId) {
+    public ResponseEntity<List<Respiracao>> buscarSessoesCompletas(@PathVariable int usuarioId) {
         List<Respiracao> sessoes = respiracaoService.buscarSessaoCompleta(usuarioId);
         return ResponseEntity.ok(sessoes);
     }
     
     // Sessões de hoje
     @GetMapping("/hoje/{usuarioId}")
-    public ResponseEntity<List<Respiracao>> buscarSessoesHoje(@PathVariable String usuarioId) {
+    public ResponseEntity<List<Respiracao>> buscarSessoesHoje(@PathVariable int usuarioId) {
         List<Respiracao> sessoes = respiracaoService.buscarSessaoDoDia(usuarioId);
         return ResponseEntity.ok(sessoes);
     }
     
     // Estatísticas do usuário
     @GetMapping("/estatisticas/{usuarioId}")
-    public ResponseEntity<Map<String, Object>> obterEstatisticas(@PathVariable String usuarioId) {
+    public ResponseEntity<Map<String, Object>> obterEstatisticas(@PathVariable int usuarioId) {
         Map<String, Object> estatisticas = respiracaoService.obterEstastistica(usuarioId);
         return ResponseEntity.ok(estatisticas);
     }
