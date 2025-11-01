@@ -1,37 +1,48 @@
-
 package com.TCC.repository;
 
-import java.time.DayOfWeek;
-import java.util.List;
-
+import com.TCC.model.Habito;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import com.TCC.model.Habito;
+import java.time.LocalDateTime;
+import java.util.List;
 
+@Repository
 public interface HabitoRepository extends JpaRepository<Habito, Integer> {
 
-    // Busca hábitos por dia da semana
-    List<Habito> findByDiaSemana(DayOfWeek diaSemana);
-    
-    // Query personalizada para buscar por dia
-    @Query("SELECT h FROM Habito h WHERE h.diaSemana = :dia")
-    List<Habito> buscarPorDia(@Param("dia") DayOfWeek dia);
-    
-    // Busca hábitos concluídos ou não
-    List<Habito> findByConcluida(Boolean concluida);
-    
-    // Conta hábitos por dia da semana
-    Long countByDiaSemana(DayOfWeek diaSemana);
-    
-    // Conta hábitos concluídos por dia da semana
-    Long countByDiaSemanaAndConcluidaTrue(DayOfWeek diaSemana);
-    
-    // Busca hábitos por dia e status de conclusão
-    List<Habito> findByDiaSemanaAndConcluida(DayOfWeek diaSemana, Boolean concluida);
-    
-    // Busca hábitos de um usuário específico
-    @Query("SELECT h FROM Habito h WHERE h.usuario.id = :usuarioId")
-    List<Habito> findByUsuarioId(@Param("usuarioId") Long usuarioId);
+    List<Habito> findByUsuario_Id(Integer usuarioId);
+
+    List<Habito> findByUsuario_IdAndDiaSemana(Integer usuarioId, String diaSemana);
+
+    List<Habito> findByUsuario_IdAndConcluida(Integer usuarioId, Boolean concluido);
+
+    List<Habito> findByUsuario_IdAndConcluidaFalse(Integer usuarioId);
+
+    List<Habito> findByUsuario_IdAndConcluidaTrueAndDataConclusaoBetween(
+        Integer usuarioId,
+        LocalDateTime inicio,
+        LocalDateTime fim
+    );
+
+    @Query("""
+        SELECT COUNT(h)
+        FROM Habito h
+        WHERE h.usuario.id = :usuarioId
+          AND h.concluida = true
+          AND h.dataConclusao >= :inicioSemana
+    """)
+    Long contarHabitosConcluidosSemana(@Param("usuarioId") Integer usuarioId,
+                                       @Param("inicioSemana") LocalDateTime inicioSemana);
+
+    @Query("""
+        SELECT 
+            (COUNT(CASE WHEN h.concluida = true THEN 1 END) * 100.0 / COUNT(h))
+        FROM Habito h
+        WHERE h.usuario.id = :usuarioId
+          AND h.dataCriacao >= :inicioSemana
+    """)
+    Double calcularTaxaConclusaoSemana(@Param("usuarioId") Integer usuarioId,
+                                       @Param("inicioSemana") LocalDateTime inicioSemana);
 }

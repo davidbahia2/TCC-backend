@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,22 +21,21 @@ public class SecurityConfig {
     @Autowired
     private SecurityFilter securityFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
-                        authorize -> authorize.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/cadastrar").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/habito/criar").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/habito/deleta/**").hasRole("ADMIN")
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+     http
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(authorize -> authorize
+             .requestMatchers("/auth/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/diario/**").hasAnyRole("ADMIN", "USUARIO")
+            .requestMatchers(HttpMethod.POST, "/api/diario/**").hasAnyRole("ADMIN", "USUARIO")
+            .anyRequest().hasRole("ADMIN") // rotas não listadas só pra admin
+        )
+        .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+  return  http.build();
+}
 
-                                .anyRequest().authenticated())
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
@@ -49,5 +47,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

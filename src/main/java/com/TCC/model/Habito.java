@@ -1,60 +1,55 @@
 package com.TCC.model;
 
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "habito")
 public class Habito {
 
-
-
-    
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private int Id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @Column(nullable = false)
-    public String tituloHabito;
-    @Column(nullable = false)
+    @Column(name = "titulo_habito", nullable = false)
+    private String tituloHabito;
+
+    @Column(name = "horario", nullable = false)
     private LocalTime horario;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "dia_semana", nullable = false)
-    private DayOfWeek diaSemana;
-    
-    @Column(name = "data_criacao")
-    private LocalDateTime dataCriacao;
-    
-    @Column(name = "concluida")
+    private String diaSemana;
 
-    private Boolean concluida = false;
-    
+    @Column(name = "data_criacao", nullable = false)
+    private LocalDateTime dataCriacao;
+
+    @Column(name = "concluida", nullable = false)
+    private Boolean concluida;
+
     @Column(name = "data_conclusao")
     private LocalDateTime dataConclusao;
- 
-       @ManyToOne
+
+    @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
+
+    @PrePersist
+    protected void onCreate() {
+        if (dataCriacao == null) {
+            dataCriacao = LocalDateTime.now();
+        }
+        if (concluida == null) {
+            concluida = false;
+        }
+    }
 }

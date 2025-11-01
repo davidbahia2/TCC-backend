@@ -1,132 +1,120 @@
 package com.TCC.service;
 
+import com.TCC.model.Habito;
+import com.TCC.repository.HabitoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.TCC.model.Habito;
-import com.TCC.repository.HabitoRepository;
 
 @Service
-@Transactional
 public class HabitoService {
 
     @Autowired
     private HabitoRepository habitoRepository;
 
-    // cria habito
-    public Habito adicionarHabito(Habito habito) {
-        habito.setTituloHabito(habito.getTituloHabito());
-        habito.setHorario(habito.getHorario());
-        habito.setDiaSemana(habito.getDiaSemana());
-        habito.setDataCriacao(habito.getDataCriacao());
-
+    public Habito criarHabito(Habito habito) {
+        if (habito.getDataCriacao() == null) {
+            habito.setDataCriacao(LocalDateTime.now());
+        }
+        if (habito.getConcluida() == null) {
+            habito.setConcluida(false);
+        }
         return habitoRepository.save(habito);
     }
 
-    // buscar por habito
-    public List<Habito> buscarTodosHabitos() {
-        return habitoRepository.findAll();
+    public List<Habito> buscarHabitosPorUsuario(Integer usuarioId) {
+        return habitoRepository.findByUsuario_Id(usuarioId);
     }
 
-    // busca por dia da semana
-    public List<Habito> buscarHabitoPorDia(DayOfWeek diaSemana) {
-        return habitoRepository.findByDiaSemana(diaSemana);
+    public Habito buscarPorId(Integer id) {
+        return habitoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Hábito não encontrado"));
     }
 
-//busca o habito atual
-    public List<Habito> buscarHabitoAgora() {
-        DayOfWeek hoje = LocalDateTime.now().getDayOfWeek();
-        return habitoRepository.buscarPorDia(hoje);
+    public Habito atualizarHabito(Integer id, Habito habitoAtualizado) {
+        Habito habitoExistente = buscarPorId(id);
+        habitoExistente.setTituloHabito(habitoAtualizado.getTituloHabito());
+        habitoExistente.setHorario(habitoAtualizado.getHorario());
+        habitoExistente.setDiaSemana(habitoAtualizado.getDiaSemana());
+        return habitoRepository.save(habitoExistente);
     }
 
-
-    public Map<DayOfWeek ,Map<String, Long>> contabilizadorPordia(){
-        Map<DayOfWeek, Map<String,Long>> resultado = new HashMap<>();
-        for(DayOfWeek dia: DayOfWeek.values()){
-         
-
-        Long totalHabito = habitoRepository.countByDiaSemana(dia);
-        Long HabitoConcluido = habitoRepository.countByDiaSemanaAndConcluidaTrue(dia);
-
-        Map<String,Long> grafico = new HashMap<>();
-        grafico.put("total", totalHabito);
-        grafico.put("concluido", HabitoConcluido);
-        grafico.put("pendentes", totalHabito - HabitoConcluido);
-            
-        resultado.put(dia, grafico);
-        }
-        return resultado;
-    }
-    public Map<DayOfWeek, Double> calculaPorcetagemConclusao(){
-        Map<DayOfWeek, Double> percentuais = new HashMap<>();
-
-        for(DayOfWeek dia: DayOfWeek.values()){
-            Long total = habitoRepository.countByDiaSemana(dia);
-            Long concluidas = habitoRepository.countByDiaSemanaAndConcluidaTrue(dia);
-
-            Double percentual = total > 0 ?(concluidas.doubleValue()/ total.doubleValue())* 100:0;
-            percentuais.put(dia, percentual);
-        }
-        return percentuais;
-
-    }
-    // marca como concluido o habito
-    public Habito concluirHabito(int HabitoId) {
-        Optional<Habito> OptHabito = habitoRepository.findById(HabitoId);
-
-        if (OptHabito.isPresent()) {
-            Habito habito = OptHabito.get();
-            habito.setConcluida(true);
-            habito.setDataConclusao(LocalDateTime.now());
-
-            return habitoRepository.save(habito);
-        }
-
-        throw new RuntimeException("Habito nao encontrado com Id" + HabitoId);
-
+    public Habito marcarComoConcluido(Integer id) {
+        Habito habito = buscarPorId(id);
+        habito.setConcluida(true);
+        habito.setDataConclusao(LocalDateTime.now());
+        return habitoRepository.save(habito);
     }
 
-    // desmarca o Habito
-    public Habito desconcluirHabito(int id) {
-        Optional<Habito> optHabito = habitoRepository.findById(id);
-
-        if (optHabito.isPresent()) {
-            Habito habito = optHabito.get();
-            habito.setConcluida(false);
-            habito.setDataConclusao(null);
-            return habitoRepository.save(habito);
-        }
-
-        throw new RuntimeException("Tarefa não encontrada com ID: " + id);
-    }
-    
-    public Habito atualizaHabito(int id, Habito habito) {
-        Optional<Habito> optHabito = habitoRepository.findById(id);
-
-        if (optHabito.isPresent()) {
-            Habito habitoExistente = optHabito.get();
-            habitoExistente.setTituloHabito(habito.getTituloHabito());
-            habitoExistente.setHorario(habito.getHorario());
-            habitoExistente.setDiaSemana(habito.getDiaSemana());
-            return habitoRepository.save(habitoExistente);
-        }
-        throw new RuntimeException("Habito nao encontrado pelo id " + id);
-
+    public Habito desmarcarConcluido(Integer id) {
+        Habito habito = buscarPorId(id);
+        habito.setConcluida(false);
+        habito.setDataConclusao(null);
+        return habitoRepository.save(habito);
     }
 
-    public void deletarHabito(int id) {
-        if (!habitoRepository.existsById(id)) {
-            throw new RuntimeException("Habito nao encontrado pelo id");
-        }
+    public void deletarHabito(Integer id) {
         habitoRepository.deleteById(id);
     }
 
+    public List<Habito> buscarHabitosPorDia(Integer usuarioId, String diaSemana) {
+        return habitoRepository.findByUsuario_IdAndDiaSemana(usuarioId, diaSemana);
+    }
+
+    public List<Habito> buscarHabitosNaoConcluidos(Integer usuarioId) {
+        return habitoRepository.findByUsuario_IdAndConcluidaFalse(usuarioId);
+    }
+
+    public List<Habito> buscarHabitosConcluidos(Integer usuarioId) {
+        return habitoRepository.findByUsuario_IdAndConcluida(usuarioId, true);
+    }
+
+    public Map<String, Object> calcularEstatisticasSemana(Integer usuarioId) {
+        LocalDateTime inicioSemana = LocalDateTime.now()
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            .withHour(0).withMinute(0).withSecond(0);
+
+        LocalDateTime fimSemana = LocalDateTime.now()
+            .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+            .withHour(23).withMinute(59).withSecond(59);
+
+        Map<String, Object> estatisticas = new HashMap<>();
+
+        Long habitosConcluidos = habitoRepository.contarHabitosConcluidosSemana(usuarioId, inicioSemana);
+
+        Double taxaConclusao = habitoRepository.calcularTaxaConclusaoSemana(usuarioId, inicioSemana);
+
+        List<Habito> todosHabitos = habitoRepository.findByUsuario_Id(usuarioId);
+
+        List<Habito> habitosConcluidosSemana = habitoRepository
+            .findByUsuario_IdAndConcluidaTrueAndDataConclusaoBetween(usuarioId, inicioSemana, fimSemana);
+
+        estatisticas.put("habitosConcluidos", habitosConcluidos);
+        estatisticas.put("taxaConclusao", taxaConclusao != null ? Math.round(taxaConclusao * 10.0) / 10.0 : 0.0);
+        estatisticas.put("totalHabitos", todosHabitos.size());
+        estatisticas.put("habitosConcluidosDetalhes", habitosConcluidosSemana);
+
+        return estatisticas;
+    }
+
+    public Map<String, Object> buscarProgressoHabitos(Integer usuarioId) {
+        List<Habito> todosHabitos = habitoRepository.findByUsuario_Id(usuarioId);
+        List<Habito> habitosConcluidos = habitoRepository.findByUsuario_IdAndConcluida(usuarioId, true);
+
+        Map<String, Object> progresso = new HashMap<>();
+        progresso.put("total", todosHabitos.size());
+        progresso.put("concluidos", habitosConcluidos.size());
+
+        double percentual = todosHabitos.isEmpty() ? 0.0 :
+            (habitosConcluidos.size() * 100.0) / todosHabitos.size();
+        progresso.put("percentual", Math.round(percentual * 10.0) / 10.0);
+
+        return progresso;
+    }
 }

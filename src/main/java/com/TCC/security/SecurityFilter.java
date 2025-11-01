@@ -1,14 +1,18 @@
 package com.TCC.security;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.TCC.enums.UserRole;
+import com.TCC.model.Usuario;
 import com.TCC.repository.UsuarioRepository;
 
 import jakarta.servlet.FilterChain;
@@ -19,39 +23,38 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
-  @Autowired
-  TokenService tokenService;
+    @Autowired
+    private TokenService tokenService;
 
-  @Autowired
-  UsuarioRepository userrepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-  @Override
-protected void doFilterInternal(HttpServletRequest request,
-                                HttpServletResponse response,
-                                FilterChain filterChain) throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-    String token = recoverToken(request);
+        var token = this.recoverToken(request);
+        var login = tokenService.validateToken(token);
 
-    if (token != null) {
-        String subject = tokenService.validadeToken(token);
-        UserDetails user = userrepository.findByNome(subject);
+        if (login != null) {
+            Usuario user = usuarioRepository.findByEmail(login)
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        if (user != null) {  // ✅ previne NullPointer
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            // 👇 evita o NullPointerException se o role estiver nulo
+            var role = (user.getRole() != null) ? user.getRole() : UserRole.USUARIO;
+
+            var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+            var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
+        filterChain.doFilter(request, response);
     }
 
-    filterChain.doFilter(request, response);
-}
-
-
-  private String recoverToken(HttpServletRequest request) {
-    var authHeader = request.getHeader("authorization");
-    if (authHeader == null)
-      return null;
-      return authHeader.replace("Bearer ", "").trim();
-
-  }
+    private String recoverToken(HttpServletRequest request) {
+        var authHeader = request.getHeader("Authorization");
+        if (authHeader == null)
+            return null;
+        return authHeader.replace("Bearer ", "");
+    }
 }

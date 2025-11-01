@@ -47,10 +47,10 @@
         }
 
         public Suporte CriarSuporte(Suporte sup){
-            sup.setNome(sup.getNome());
+        
             sup.setCidade(sup.getCidade());
             sup.setLocalizacao(sup.getLocalizacao());
-            sup.setServicos(sup.getServicos());
+          
             sup.setTelefone(sup.getTelefone());
             sup.setEspecialidade(sup.getEspecialidade());
 
@@ -63,8 +63,6 @@
             Suporte suporteExiste = supOpt.get();
             suporteExiste.setCidade(atualiza.getCidade());
             suporteExiste.setEspecialidade(atualiza.getEspecialidade());
-            suporteExiste.setNome(atualiza.getNome());
-            suporteExiste.setServicos(atualiza.getServicos());
             suporteExiste.setTelefone(atualiza.getTelefone());
             suporteExiste.setEstado(atualiza.getEstado());
 
@@ -83,23 +81,21 @@
         private SuporteDTO convertToDTO(Suporte suporte) {
                 return new SuporteDTO(
                     suporte.getId(),
-                    suporte.getNome(),
                     suporte.getEspecialidade(),
                     suporte.getCidade(),
                     suporte.getEstado(),
-                    suporte.getTelefone(),
-                    suporte.getServicos()
+                    suporte.getTelefone()
+                
                 );
         }
 
         private Suporte convertToModel(SuporteDTO dto) {
                 return new Suporte(
-                    dto.getNome(),
+                    dto.getId(),
                     dto.getEspecialidade(),
                     dto.getCidade(),
                     dto.getEstado(),
-                    dto.getTelefone(),
-                    dto.getServicos()
+                    dto.getTelefone(), null
                 );
         }
 

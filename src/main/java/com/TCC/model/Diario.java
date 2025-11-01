@@ -1,16 +1,12 @@
 package com.TCC.model;
 
-import java.time.LocalDateTime;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;  // <-- MUDE ESTE IMPORT
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,13 +15,28 @@ import lombok.Setter;
 @Entity
 @Table(name = "diario")
 public class Diario {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    
-    private int userId;
-    private String humor; 
+    private Integer id;
+
+    @Column(name = "humor", nullable = false)
+    private String humor;
+
+    @Column(name = "descricao_pensamentos")
     private String descricaoPensamentos;
+
+    @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
+    @PrePersist
+    protected void onCreate() {
+        if (dataCriacao == null) {
+            dataCriacao = LocalDateTime.now();
+        }
+    }
 }

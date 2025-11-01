@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SuporteDTO {
     private Integer id;
-    private String nome;
+
     private String especialidade;
     private String cidade;
     private String estado;
     private String telefone;
-    private List<String> servicos;
+
 }

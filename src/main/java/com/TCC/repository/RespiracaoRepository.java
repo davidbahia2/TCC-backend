@@ -13,40 +13,54 @@ import com.TCC.model.Respiracao;
 
 public interface RespiracaoRepository extends JpaRepository<Respiracao, Integer> {
 
-    // Busca por tipo de respiração
     List<Respiracao> findByTipoRespiracao(TipoRespiracao tipoRespiracao);
 
-    // Busca sessões de um usuário em um período
-    @Query("SELECT r FROM Respiracao r WHERE r.usuarioId = :usuarioId AND r.dataInicio >= :inicio AND r.dataInicio <= :fim")
+    @Query("""
+        SELECT r FROM Respiracao r
+        WHERE r.usuario.id = :usuarioId
+          AND r.dataInicio BETWEEN :inicio AND :fim
+    """)
     List<Respiracao> procurarUsuarioPorSessao(
-        @Param("usuarioId") int usuarioId, 
-        @Param("inicio") LocalDateTime inicio, 
+        @Param("usuarioId") int usuarioId,
+        @Param("inicio") LocalDateTime inicio,
         @Param("fim") LocalDateTime fim
     );
 
-    // Busca todas as sessões completas de um usuário
-    @Query("SELECT r FROM Respiracao r WHERE r.usuarioId = :usuarioId AND r.sessaoCompleta = true")
+    @Query("""
+        SELECT r FROM Respiracao r
+        WHERE r.usuario.id = :usuarioId
+          AND r.sessaoCompleta = true
+    """)
     List<Respiracao> procuraSessaoCompleta(@Param("usuarioId") int usuarioId);
 
-    // Conta total de sessões por usuário
-    Long countByUsuarioId(int usuarioId);
+    Long countByUsuario_Id(int usuarioId);
 
-    // Busca sessão incompleta por usuário ID
-    @Query("SELECT r FROM Respiracao r WHERE r.usuarioId = :usuarioId AND r.sessaoCompleta = false")
+    @Query("""
+        SELECT r FROM Respiracao r
+        WHERE r.usuario.id = :usuarioId
+          AND r.sessaoCompleta = false
+    """)
     Optional<Respiracao> buscarSessaoIncompleta(@Param("usuarioId") int usuarioId);
 
-    // Busca sessões em um período específico
-    @Query("SELECT r FROM Respiracao r WHERE r.usuarioId = :usuarioId AND r.dataInicio >= :inicio AND r.dataInicio <= :fim")
+    @Query("""
+        SELECT r FROM Respiracao r
+        WHERE r.usuario.id = :usuarioId
+          AND r.dataInicio BETWEEN :inicio AND :fim
+    """)
     List<Respiracao> procurarSessaoPeriodo(
-        @Param("usuarioId") int usuarioId, 
-        @Param("inicio") LocalDateTime inicio, 
+        @Param("usuarioId") int usuarioId,
+        @Param("inicio") LocalDateTime inicio,
         @Param("fim") LocalDateTime fim
     );
 
-    // Busca sessões completas por tipo de respiração
-    @Query("SELECT r FROM Respiracao r WHERE r.usuarioId = :usuarioId AND r.tipoRespiracao = :tipo AND r.sessaoCompleta = true")
+    @Query("""
+        SELECT r FROM Respiracao r
+        WHERE r.usuario.id = :usuarioId
+          AND r.tipoRespiracao = :tipo
+          AND r.sessaoCompleta = true
+    """)
     List<Respiracao> procurarSessaoCompletaPorTipo(
-        @Param("usuarioId") int usuarioId, 
+        @Param("usuarioId") int usuarioId,
         @Param("tipo") TipoRespiracao tipo
     );
 }

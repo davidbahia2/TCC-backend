@@ -1,65 +1,35 @@
 package com.TCC.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
 @Entity
 @Table(name = "suporte")
 public class Suporte {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    @Column(name = "localizacao")
+    @Column(name = "localizacao", nullable = false)
     private String localizacao;
 
-    @Column(name = "nome")
-    private String nome;
-
-    @Column(name = "telefone")
+    @Column(name = "telefone", nullable = false)
     private String telefone;
 
-    @Column(name = "cidade")
+    @Column(name = "cidade", nullable = false)
     private String cidade;
 
-    @Column(name = "especialidade")
+    @Column(name = "especialidade", nullable = false)
     private String especialidade;
 
-    @Column(name = "estado")
+    @Column(name = "estado", nullable = false)
     private String estado;
-
-@ElementCollection
-@CollectionTable(name = "suporte_servicos", joinColumns = @JoinColumn(name = "suporte_id"))
-@Column(name = "servico_nome")
-private List<String> servicos = new ArrayList<>();
-
-    public Suporte(String nome, String especialidade, String cidade, String estado, String telefone,
-            List<String> servicos) {
-        this.nome = nome;
-        this.especialidade = especialidade;
-        this.cidade = cidade;
-        this.estado = estado;
-        this.telefone = telefone;
-        this.servicos = servicos;
-    }
-
 }
